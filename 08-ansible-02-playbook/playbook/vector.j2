@@ -1,11 +1,22 @@
-sources:
-  in:
-    type: "stdin"
-
-sinks:
-  out:
+transforms:
+  transform0:
+    inputs: []
+    drop_on_abort: false
+    drop_on_error: false
+    metric_tag_values: single
+    reroute_dropped: false
+    runtime: ast
+    type: remap
+  transform1:
     inputs:
-      - "in"
-    type: "console"
-    encoding:
-      codec: "text"
+    - transform0
+    condition: .message = "value"
+    type: filter
+  transform2:
+    inputs:
+    - transform1
+    expire_after_ms: 30000
+    flush_period_ms: 1000
+    group_by: []
+    type: reduce
+    merge_strategies: {}

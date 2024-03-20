@@ -1,24 +1,11 @@
-# ---
-# clickhouse:
-#   hosts:
-#     clickhouse-01:
-#       ansible_host: localhost
-#     clickhouse-common-static:
-#       ansible_host: 172.17.0.7
-# вщсулк
-all:
-  children:
-    clickhouse:
-      hosts:
-        clickhouse_common_static:
-          ansible_host: 62.84.114.247
-          ansible_user: centos
-          # ansible_connection: docker
-        clickhouse_server:
-          ansible_host: 51.250.82.235
-          ansible_user: centos
-          # ansible_connection: docker
-        clickhouse_client:
-          ansible_host: 158.160.122.19
-          ansible_user: centos
-          # ansible_connection: docker
+clickhouse:
+  hosts:
+      clickhouse-server:
+        ansible_host: 178.154.220.209 
+        ansible_user: centos
+      clickhouse-common-statick:
+        ansible_host: 178.154.201.38 
+        ansible_user: centos
+      clickhouse-client:
+        ansible_host: 84.252.130.110 
+        ansible_user: centos

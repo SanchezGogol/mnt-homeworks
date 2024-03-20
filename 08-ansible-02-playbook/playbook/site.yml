@@ -7,41 +7,57 @@
       ansible.builtin.service:
         name: clickhouse-server
         state: restarted
-    - name: Start vector service
+    - name: Start vector service 
       become: true
       ansible.builtin.service:
-        name: all
+        name: vector
         state: restarted
-  tasks:
-    # - name: install sudo
-    #   ansible.builtin.command: "yum install sudo -y"
+  tasks:  
     - block:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm" #версия пакета изменена, т.к. вкаталоге небыло той версии, которая подразумевалась к установке.
             dest: "./{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
           with_items: "{{ clickhouse_packages }}"
       rescue:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
+            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm" 
             dest: "./clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
     - name: Install clickhouse packages
       become: true
       ansible.builtin.yum:
-        name:
+        name:        
           - clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm
           - clickhouse-client-{{ clickhouse_version }}.x86_64.rpm
           - clickhouse-server-{{ clickhouse_version }}.x86_64.rpm
       notify: Start clickhouse service
     - name: Flush handlers
       meta: flush_handlers
+    - name: Pause for 30 seconds  #Задержка на период запуска сервиса кликхауз
+      pause:
+        seconds: 30
     - name: Create database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc !=82
       changed_when: create_db.rc == 0
-    # - name: Install vector
-    #   ansible.builtin.command: "curl --proto '=https' --tlsv1.2 -sSfL https://sh.vector.dev | bash"
-    #- name: copy config vector
-
+    - name: vector download
+      ansible.builtin.get_url: #получаем файл для установки
+        url: "https://packages.timber.io/vector/0.36.0/vector-0.36.0-1.x86_64.rpm" #ссылка на загрузку
+        dest: "./vector_0.36.0-1_amd64.rpm" #местоназначение и имя файла
+    - name: vector deploy
+      ansible.builtin.yum: #устанавливаем vector
+        name: 
+          - vector_0.36.0-1_amd64.rpm #
+      become: true  #выполнение с повышенными привилегиями
+    - name: start vector demon
+      ansible.builtin.command: "systemctl start vector"
+      become: true
+    # - name: template config 
+    #   ansible.builtin.template:
+    #     src: ./vector.j2
+    #     dest: /etc/vector/vector.yaml
+    #   become: true
+    #   notify: Start vector service
+     
