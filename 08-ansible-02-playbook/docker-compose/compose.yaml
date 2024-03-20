@@ -1,0 +1,21 @@
+version: "2.0"
+services:
+  clickhouse-client:
+    image: centos:centos7.9.2009
+    network_mode: host
+    container_name: clickhouse-client
+    #restart: 
+    #ports:
+    #- "5000:5000"
+  clickhouse-server:
+    image: centos:centos7.9.2009
+    network_mode: host
+    container_name: clickhouse-server
+    #restart: 
+    #ports:
+    #- "5000:5000"
+  clickhouse-common-static:
+    image: centos:centos7.9.2009
+    network_mode: host
+    container_name: clickhouse-common-static
+    #restart: 
