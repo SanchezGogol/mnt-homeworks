@@ -1,0 +1,12 @@
+clickhouse:
+  hosts:
+      # clickhouse-server:
+      #   ansible_host: 158.160.42.221 
+      #   ansible_user: centos
+      # clickhouse-common-statick:
+      #   ansible_host: 158.160.36.244 
+      #   ansible_user: centos
+      clickhouse-client:
+        ansible_host: 158.160.122.68 
+        ansible_user: centos
+
